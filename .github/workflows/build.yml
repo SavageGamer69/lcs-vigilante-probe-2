@@ -1,0 +1,28 @@
+name: Build LCSVigilanteProbe2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Compile 32-bit ASI
+        shell: cmd
+        run: >-
+          cl /nologo /std:c++17 /EHsc /O2 /LD /MT
+          /DWIN32_LEAN_AND_MEAN /D_CRT_SECURE_NO_WARNINGS
+          /Fe:LCSVigilanteProbe2.asi LCSVigilanteProbe2.cpp
+          /link /MACHINE:X86 /SUBSYSTEM:WINDOWS
+      - name: Upload ASI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LCSVigilanteProbe2-x86
+          path: LCSVigilanteProbe2.asi
+          if-no-files-found: error
